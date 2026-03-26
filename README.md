@@ -11,43 +11,35 @@ claude plugin install ceveto
 
 ## Setup
 
-1. Go to your Ceveto dashboard → **Settings → API Keys** → **Create**
-2. Save the username and private key
-3. In Claude Code, run:
+In Claude Code, run:
 
 ```
 /ceveto:setup
 ```
 
-4. Paste your credentials when prompted
-5. Restart MCP with `/mcp`
+Choose **Hosted** (recommended) or **Local** mode, then follow the prompts.
 
-That's it — Claude can now access your Ceveto data.
+## Connection Modes
+
+### Hosted (recommended)
+
+Connects to `mcp.ceveto.com` — no local install needed. Just your API credentials.
+
+### Local
+
+Runs MCP server locally via `uvx`. Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
 ## What you can do
 
-Once connected, Claude can:
+Once connected, Claude can manage your Ceveto data:
 
-- List and manage contacts, tasks, locations
-- View and update assets (CMMS)
-- Track time entries and schedules
-- Manage teams, skills, tags
-- And more — all Ceveto modules are available
+- Contacts, tasks, locations, assets (CMMS)
+- Time tracking, schedules, teams, skills
+- Tags, documents, payments, and more
 
-Tools are generated dynamically from the API — when Ceveto adds new features, your tools update automatically.
-
-## Requirements
-
-- [uv](https://docs.astral.sh/uv/) (Python package manager) — installed automatically by Claude Code
-- A Ceveto account with API key access
-
-## How it works
-
-The plugin runs a lightweight MCP server locally via `uvx`. It connects to your Ceveto instance with Ed25519-signed requests, reads the API schema, and creates tools for each endpoint. Only tools you have permission to use are shown.
+Tools are generated dynamically from the API — new features appear automatically.
 
 ## Multi-account
-
-If your API key has access to multiple accounts, use:
 
 - `whoami` — see current account
 - `list_accounts` — see all accounts
@@ -55,6 +47,7 @@ If your API key has access to multiple accounts, use:
 
 ## Security
 
-- **Ed25519 cryptographic signatures** on every API request
+- **Ed25519 signatures** on every API request
+- **OAuth 2.1** browser-based authorization
 - **Permission-filtered tools** — only what your key can access
-- **Credentials stay local** — stored only in `.mcp.json` (auto-added to `.gitignore`)
+- **Credentials stay local** — `.mcp.json` auto-added to `.gitignore`

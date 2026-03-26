@@ -9,25 +9,47 @@ allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
 
 Connect Claude Code to a Ceveto account via MCP.
 
-## What you need
-
-Get your API credentials from the Ceveto dashboard:
-1. Go to **Settings → API Keys**
-2. Click **Create API Key**
-3. Save the **Username** and **Private Key** (shown only once)
-
 ## Steps
 
-### 1. Ask for credentials
+### 1. Ask the user how they want to connect
 
-Ask the user for:
-- **Username** — the API key username from their Ceveto dashboard
-- **Private Key** — the Ed25519 private key (64-char hex string)
-- **Base URL** — default is `https://api.ceveto.com`, confirm with user
+Two options:
 
-### 2. Write .mcp.json
+**A) Hosted (recommended)** — connect to `mcp.ceveto.com`. No local install needed.
+**B) Local** — run MCP server locally via `uvx`. Needs Python + uv.
 
-Write to the current project root `.mcp.json`:
+### 2A. Hosted setup
+
+Ask for API credentials from the Ceveto dashboard (Settings → API Keys → Create):
+- **Username**
+- **Private Key**
+
+Write to `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "ceveto": {
+      "url": "https://mcp.ceveto.com/sse"
+    }
+  }
+}
+```
+
+Note: In hosted mode, the user authenticates by calling the `connect` tool
+with their OAuth access token after connecting. The MCP server handles
+auth per-session.
+
+For now (before OAuth browser flow), users can also use local mode.
+
+### 2B. Local setup
+
+Ask for:
+- **Username** — API key username
+- **Private Key** — Ed25519 private key (64-char hex)
+- **Base URL** — default `https://api.ceveto.com`
+
+Write to `.mcp.json`:
 
 ```json
 {
@@ -45,15 +67,12 @@ Write to the current project root `.mcp.json`:
 }
 ```
 
-If `.mcp.json` already exists, merge the `ceveto` entry into the existing `mcpServers` object.
+If `.mcp.json` already exists, merge the `ceveto` entry into existing `mcpServers`.
 
 ### 3. Protect secrets
 
-Add `.mcp.json` to `.gitignore` if not already there. This file contains credentials.
+Add `.mcp.json` to `.gitignore` if not already there.
 
 ### 4. Done
 
-Tell the user:
-- Restart MCP with `/mcp` in Claude Code
-- The `ceveto` server will appear with tools like `whoami`, `list_contacts`, etc.
-- First time may take ~10 seconds while `uvx` downloads the package
+Tell the user to restart MCP with `/mcp` in Claude Code.
