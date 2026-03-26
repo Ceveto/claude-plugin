@@ -6,8 +6,6 @@
     "name": "Ceveto"
   },
   "homepage": "https://github.com/Ceveto/claude-plugin",
-  "repository": {
-    "url": "https://github.com/Ceveto/claude-plugin.git"
-  },
+  "repository": "https://github.com/Ceveto/claude-plugin",
   "license": "MIT"
 }
