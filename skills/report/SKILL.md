@@ -34,9 +34,24 @@ ToolSearch query: "mcp__ceveto__report" → any report endpoints
 
 ## Flow
 
-### 1. Verify connection and note account
+### 1. Verify connection, permissions, and discover tools
 
-Call `mcp__ceveto__whoami`. Use account_name for report header.
+Call `mcp__ceveto__whoami`. From the response:
+- Use `account_name` for report header
+- Check `is_owner` — if true, can report on all modules
+- Check `permissions` — only include modules the user has read access to
+
+For each module in the report, verify the user has at least `read` permission
+before calling list tools. Skip modules without access — don't show errors,
+just omit them and note "X modules not accessible with current permissions".
+
+Use ToolSearch to discover available list tools:
+```
+ToolSearch query: "mcp__ceveto__list"
+```
+
+Read tool descriptions to understand available filter parameters and
+return fields — use these to build better aggregations.
 
 ### 2. Determine report scope
 
@@ -111,9 +126,45 @@ Generated: {date}
 - 2 contacts inactive
 ```
 
-### 6. Offer follow-up
+### 6. Save report snapshot
+
+Save the raw aggregated data to `${CLAUDE_PLUGIN_DATA}/last-report.json`
+(resolves to `~/.claude/plugins/data/ceveto/last-report.json`):
+
+```json
+{
+  "account": "pixels",
+  "generated_at": "2026-03-26T22:00:00Z",
+  "totals": {"contacts": 16, "tasks": 42, "locations": 8},
+  "tasks_by_status": {"open": 12, "in_progress": 18, "completed": 12},
+  "contacts_by_type": {"client": 5, "supplier": 4},
+  "alerts": ["3 tasks overdue", "2 contacts inactive"]
+}
+```
+
+Create the directory if it doesn't exist:
+```bash
+mkdir -p ~/.claude/plugins/data/ceveto
+```
+
+### 7. Compare with previous report
+
+Before generating, check if `~/.claude/plugins/data/ceveto/last-report.json` exists.
+If it does, load it and compute deltas:
+
+```
+Since last report (2026-03-25):
+  +3 new tasks (39 → 42)
+  +1 new contact (15 → 16)
+  -2 tasks completed
+  1 new overdue task
+```
+
+Show deltas in an extra section at the top of the report.
+
+### 8. Offer follow-up
 
 - "Want me to drill into any section?"
 - "I can generate a more detailed report for a specific module"
 - "Want me to save this as a markdown file?"
-- "I can compare with data from a different date range"
+- "I can compare specific modules over time"

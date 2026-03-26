@@ -66,11 +66,56 @@ Most list tools accept:
 
 ## Flow
 
-### 1. Verify connection
+### 1. Verify connection and check permissions
 
-Call `mcp__ceveto__whoami`. If fails, tell user to set up MCP first.
+Call `mcp__ceveto__whoami`. Parse the response:
 
-### 2. Determine what to explore
+```json
+{
+  "account_name": "Pixels",
+  "is_owner": true,
+  "permissions": {
+    "contacts": {"read": {}, "write": {}},
+    "tasks": {"read": {}},
+    "locations": {"read": {}, "write": {"max_amount": 5000}}
+  }
+}
+```
+
+**Permission rules:**
+- `is_owner: true` → full access to everything, skip permission checks
+- `permissions` dict maps module → allowed actions (read/write/admin)
+- If module is missing from permissions → user has NO access to it
+- `read` → can list and get, but NOT create/update/delete
+- `write` → can list, get, create, update, delete
+- `admin` → all of write + admin actions
+- Conditions like `max_amount: 5000` are limits on write operations
+
+**Before calling any tool**, check permissions:
+- Only offer list/get for modules with `read` permission
+- Only offer create/update/delete for modules with `write` permission
+- If a module is not in permissions (and not owner), tell the user:
+  "You don't have access to {module}. Contact your admin."
+- If write has conditions (e.g. max_amount), mention the limit
+
+Save permissions to `~/.claude/plugins/data/ceveto/permissions.json` so
+other skill invocations can reuse without re-calling whoami.
+
+### 2. Discover available tools
+
+The MCP tools are dynamically generated from the API's OpenAPI schema.
+Each tool has a description with parameters and return type info.
+
+Use ToolSearch to find tools for the module the user wants:
+```
+ToolSearch query: "mcp__ceveto__contact"  → contact tools
+ToolSearch query: "mcp__ceveto__task"     → task tools
+```
+
+Read the tool descriptions — they contain parameter names, types,
+valid enum values, and any permission limits.
+
+### 3. Determine what to explore
 
 If $ARGUMENTS provided (e.g. "contacts"), explore that module.
 

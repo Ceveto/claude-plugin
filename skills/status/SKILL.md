@@ -66,3 +66,23 @@ If something is wrong, show specific troubleshooting for the failure:
 - "MCP not connected" → `/mcp` restart
 - "Invalid credentials" → `ceveto api-key` to regenerate
 - "No permissions" → API user needs to be set as owner or given permissions
+
+### 6. Save connection state
+
+Save current connection info to `~/.claude/plugins/data/ceveto/connection.json`:
+```json
+{
+  "account_slug": "pixels",
+  "account_name": "Pixels",
+  "is_owner": true,
+  "environment": "dev",
+  "base_url": "https://localhost:8400",
+  "last_checked": "2026-03-26T22:00:00Z",
+  "tools_count": 329
+}
+```
+
+Create directory if needed: `mkdir -p ~/.claude/plugins/data/ceveto`
+
+This lets other skills (explore, report) quickly know the current state
+without re-calling whoami every time.
