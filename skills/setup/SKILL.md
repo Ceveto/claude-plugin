@@ -86,9 +86,20 @@ Add `.mcp.json` to `.gitignore` if not already there.
 
 Tell the user to restart MCP with `/mcp` in Claude Code.
 
-After restart, call `whoami` to verify the connection works. Show the account name and whether they're an owner.
+After restart, verify by calling MCP tools:
 
-If connection fails, troubleshoot:
-- Is the backend running? (dev mode)
-- Are credentials correct?
-- Is the URL reachable?
+1. Call `mcp__ceveto__whoami` — should return account info
+2. If successful, show: account name, slug, owner status
+3. Call `mcp__ceveto__list_accounts` — show all available accounts
+4. Try `mcp__ceveto__list_contacts` with limit=3 — verify data access
+
+If `whoami` fails:
+- "No such tool" → MCP not connected, try `/mcp` restart
+- Connection error → backend not running (dev: `make dev-backend`)
+- 401 → credentials invalid, regenerate with `ceveto api-key`
+- 403 → API user has no permissions, set as owner
+
+If verification succeeds, tell the user they can now:
+- Say "explore ceveto data" to browse their data
+- Say "ceveto report" for a business summary
+- Ask anything about their contacts, tasks, locations etc.

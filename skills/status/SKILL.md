@@ -2,51 +2,67 @@
 name: status
 description: Check Ceveto MCP connection status. Use when the user says "ceveto status", "is ceveto connected", "check connection", "which account", or wants to verify their MCP setup.
 user-invocable: true
-allowed-tools: Read, Bash, Glob
+allowed-tools: Read, Bash, Glob, mcp__ceveto__whoami, mcp__ceveto__list_accounts
 ---
 
 # Ceveto Connection Status
 
 ## Steps
 
-### 1. Check .mcp.json
+### 1. Check .mcp.json config
 
-Read `.mcp.json` from the project root. If no `ceveto` server configured, tell the user to run `/ceveto:setup`.
+Read `.mcp.json` from the project root. Determine:
+- **Mode**: if has `command` key → Local, if has `url` key → Hosted
+- **Environment**: parse `CEVETO_MCP_BASE_URL`:
+  - `localhost` → Dev
+  - `api.ceveto.dev` → Staging
+  - `api.ceveto.com` → Production
+- Show username (first 8 chars + `...`). Never show the private key.
 
-### 2. Show current config
+If no `ceveto` server in `.mcp.json`, tell user to run `setup ceveto`.
 
-Display:
-- **Mode**: Local (uvx) or Hosted (SSE)
-- **Environment**: Dev / Staging / Production (based on URL)
-- **Base URL**: the API endpoint
+### 2. Test connection via MCP tools
 
-For local mode, show the username (first 8 chars + ...).
-Never show the private key.
+Call the `mcp__ceveto__whoami` tool. Parse the JSON response.
 
-### 3. Test connection
+If it succeeds, extract:
+- `account_name` and `account_slug`
+- `is_owner` (true/false)
+- `username`
 
-Try calling the `whoami` MCP tool. If it works, show:
-- Account name and slug
-- Whether the user is an owner
-- Number of available MCP tools
+If it fails with "No such tool available", MCP is not connected — tell user:
+- Run `/mcp` to open MCP dialog and check if ceveto is enabled
+- Or restart Claude Code session
 
-If it fails, show troubleshooting tips:
-- Backend not running (dev)
-- Invalid credentials
-- Network issues
+If it fails with connection error, the backend is likely not running.
 
-### 4. Show available accounts
+### 3. List accounts
 
-Call `list_accounts` to show all accounts this API key has access to.
+Call `mcp__ceveto__list_accounts`. Show all available accounts with name, slug, and owner status.
 
-### 5. Summary
+### 4. Count available tools
 
-Print a clean status summary:
+Use ToolSearch to count `mcp__ceveto__*` tools:
 ```
-Ceveto MCP: Connected
-Account: Pixels (pixels)
-Mode: Local (uvx)
-Environment: Dev (localhost:8400)
-Owner: Yes
-Tools: 384 registered
+ToolSearch query: "mcp__ceveto__"
 ```
+Report the count.
+
+### 5. Print summary
+
+Format as a clean block:
+```
+Ceveto MCP: Connected ✓
+Account:     {name} ({slug})
+Mode:        Local (uv) / Hosted (SSE)
+Environment: Dev / Staging / Production
+Owner:       Yes / No
+Accounts:    {count}
+MCP Tools:   {count} registered
+```
+
+If something is wrong, show specific troubleshooting for the failure:
+- "Backend not running" → `cd new-ceveto && make dev-backend`
+- "MCP not connected" → `/mcp` restart
+- "Invalid credentials" → `ceveto api-key` to regenerate
+- "No permissions" → API user needs to be set as owner or given permissions

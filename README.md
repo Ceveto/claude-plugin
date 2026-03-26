@@ -11,12 +11,14 @@ claude plugin install ceveto
 
 ## Skills
 
-| Skill | Command | Description |
+| Skill | Trigger | Description |
 |-------|---------|-------------|
-| **Setup** | `/ceveto:setup` | Configure MCP connection (hosted or local) |
-| **Status** | `/ceveto:status` | Check connection, show account info |
-| **Switch Environment** | `/ceveto:switch-env staging` | Switch between dev/staging/production |
-| **API Key** | `/ceveto:api-key pixels` | Generate API key (dev mode only) |
+| **Setup** | "setup ceveto" | Configure MCP connection (hosted or local) |
+| **Status** | "ceveto status" | Check connection, account info, tool count |
+| **Explore** | "show me contacts" | Browse and search business data via MCP |
+| **Report** | "ceveto report" | Generate business summaries and analytics |
+| **Switch Env** | "switch to staging" | Switch between dev/staging/production |
+| **API Key** | "create api key" | Generate API key (dev mode only) |
 
 ## Quick Start
 
