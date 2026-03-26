@@ -23,7 +23,7 @@ Get your API credentials from the Ceveto dashboard:
 Ask the user for:
 - **Username** — the API key username from their Ceveto dashboard
 - **Private Key** — the Ed25519 private key (64-char hex string)
-- **Base URL** — default is `https://app.ceveto.com`, confirm with user
+- **Base URL** — default is `https://api.ceveto.com`, confirm with user
 
 ### 2. Write .mcp.json
 
