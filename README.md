@@ -1,6 +1,6 @@
 # Ceveto Claude Plugin
 
-Claude Code plugin for connecting to the Ceveto business management API via MCP (Model Context Protocol).
+Connect Claude Code to your [Ceveto](https://ceveto.com) account. Claude gets direct access to your contacts, tasks, locations, assets, and more.
 
 ## Install
 
@@ -11,49 +11,50 @@ claude plugin install ceveto
 
 ## Setup
 
-After installation, run the setup skill in your Ceveto project:
+1. Go to your Ceveto dashboard → **Settings → API Keys** → **Create**
+2. Save the username and private key
+3. In Claude Code, run:
 
 ```
 /ceveto:setup
 ```
 
-The skill will automatically find the backend, generate API credentials, and configure everything.
+4. Paste your credentials when prompted
+5. Restart MCP with `/mcp`
 
-## What you get
+That's it — Claude can now access your Ceveto data.
 
-Once configured, Claude Code gets direct access to the Ceveto API. Tools are dynamically generated from the backend's OpenAPI schema — every API endpoint becomes an MCP tool automatically.
+## What you can do
 
-Modules include: Contacts, Tasks, Locations, Assets (CMMS), Time Tracking (Traksy), Teams, Skills, Tags, Documents, Payments, and more.
+Once connected, Claude can:
+
+- List and manage contacts, tasks, locations
+- View and update assets (CMMS)
+- Track time entries and schedules
+- Manage teams, skills, tags
+- And more — all Ceveto modules are available
+
+Tools are generated dynamically from the API — when Ceveto adds new features, your tools update automatically.
 
 ## Requirements
 
-- Python 3.13+ with [uv](https://docs.astral.sh/uv/)
-- A running Ceveto backend
-- An account in the system
+- [uv](https://docs.astral.sh/uv/) (Python package manager) — installed automatically by Claude Code
+- A Ceveto account with API key access
 
 ## How it works
 
-```
-Claude Code → MCP Server (ceveto_mcp/) → Ed25519 signed HTTP → Dashboard API
-```
-
-1. The MCP server runs as a subprocess launched by Claude Code
-2. On startup it fetches the OpenAPI schema from the backend
-3. Each API endpoint becomes an MCP tool with proper parameter schemas
-4. Tools are filtered by the API user's permissions — read-only users only see read tools
-5. Condition limits (e.g. `max_amount`) are shown in tool descriptions
+The plugin runs a lightweight MCP server locally via `uvx`. It connects to your Ceveto instance with Ed25519-signed requests, reads the API schema, and creates tools for each endpoint. Only tools you have permission to use are shown.
 
 ## Multi-account
 
-One API key can access multiple accounts. The MCP server auto-selects if only one account is available, or you can switch with:
+If your API key has access to multiple accounts, use:
 
 - `whoami` — see current account
-- `list_accounts` — see all available accounts
+- `list_accounts` — see all accounts
 - `switch_default_account` — change active account
 
 ## Security
 
-- **Ed25519 signatures** — no shared secrets, cryptographic request signing
-- **Permission-filtered tools** — only tools the API key has access to are registered
-- **Method-level filtering** — read-only keys don't see write tools
-- **Credentials in .mcp.json** — automatically added to .gitignore during setup
+- **Ed25519 cryptographic signatures** on every API request
+- **Permission-filtered tools** — only what your key can access
+- **Credentials stay local** — stored only in `.mcp.json` (auto-added to `.gitignore`)

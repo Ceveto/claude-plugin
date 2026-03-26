@@ -1,77 +1,59 @@
 ---
 name: setup
-description: Set up Ceveto MCP server connection. Use when configuring Ceveto API access, generating API keys, or updating MCP credentials. Also use when the user says "setup ceveto", "configure ceveto", "connect to ceveto".
+description: Set up Ceveto MCP connection. Use when the user says "setup ceveto", "configure ceveto", "connect to ceveto", or wants to add Ceveto API access.
 user-invocable: true
-allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
+allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
 ---
 
-# Configure Ceveto MCP Server
+# Configure Ceveto MCP Connection
 
-Set up the Ceveto MCP server so Claude Code can interact with the Ceveto API.
+Connect Claude Code to a Ceveto account via MCP.
+
+## What you need
+
+Get your API credentials from the Ceveto dashboard:
+1. Go to **Settings → API Keys**
+2. Click **Create API Key**
+3. Save the **Username** and **Private Key** (shown only once)
 
 ## Steps
 
-### 1. Find the backend
+### 1. Ask for credentials
 
-Look for the `new-ceveto` directory. Check these locations in order:
-- `./new-ceveto/ceveto_mcp/__main__.py` (monorepo root)
-- `./ceveto_mcp/__main__.py` (inside new-ceveto already)
-- `../new-ceveto/ceveto_mcp/__main__.py` (sibling directory)
+Ask the user for:
+- **Username** — the API key username from their Ceveto dashboard
+- **Private Key** — the Ed25519 private key (64-char hex string)
+- **Base URL** — default is `https://app.ceveto.com`, confirm with user
 
-If not found, ask the user where their `new-ceveto` directory is.
+### 2. Write .mcp.json
 
-### 2. Install dependencies
-
-```bash
-cd <backend-path> && uv sync 2>&1 | tail -3
-```
-
-### 3. Determine the backend URL
-
-Check if the dev server is running. The default is `https://localhost:8400`. Ask the user to confirm.
-
-### 4. Generate API credentials
-
-Ask the user which account to use. To see available accounts:
-
-```bash
-cd <backend-path> && uv run python manage.py create_mcp_key --help
-```
-
-Then generate:
-
-```bash
-cd <backend-path> && uv run python manage.py create_mcp_key <account-slug> --name "Claude MCP"
-```
-
-Save the output — the private key is shown only once.
-
-### 5. Write .mcp.json
-
-Write to the project root `.mcp.json`:
+Write to the current project root `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "ceveto": {
-      "command": "uv",
-      "args": ["run", "--directory", "<backend-path>", "python", "-m", "ceveto_mcp"],
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/Ceveto/mcp-server", "ceveto-mcp"],
       "env": {
         "CEVETO_MCP_BASE_URL": "<base-url>",
-        "CEVETO_MCP_USERNAME": "<username-from-output>",
-        "CEVETO_MCP_PRIVATE_KEY": "<private-key-from-output>"
+        "CEVETO_MCP_USERNAME": "<username>",
+        "CEVETO_MCP_PRIVATE_KEY": "<private-key>"
       }
     }
   }
 }
 ```
 
-If `.mcp.json` already exists, merge the `ceveto` server into existing config.
+If `.mcp.json` already exists, merge the `ceveto` entry into the existing `mcpServers` object.
 
-### 6. Protect secrets
+### 3. Protect secrets
 
-Add `.mcp.json` to `.gitignore` if not already there.
+Add `.mcp.json` to `.gitignore` if not already there. This file contains credentials.
 
-### 7. Done
+### 4. Done
 
-Tell the user to restart MCP with `/mcp` and test with the `whoami` tool.
+Tell the user:
+- Restart MCP with `/mcp` in Claude Code
+- The `ceveto` server will appear with tools like `whoami`, `list_contacts`, etc.
+- First time may take ~10 seconds while `uvx` downloads the package
