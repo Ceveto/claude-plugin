@@ -9,25 +9,22 @@ claude plugin marketplace add https://github.com/Ceveto/claude-plugin
 claude plugin install ceveto
 ```
 
-## Setup
+## Skills
 
-In Claude Code, run:
+| Skill | Command | Description |
+|-------|---------|-------------|
+| **Setup** | `/ceveto:setup` | Configure MCP connection (hosted or local) |
+| **Status** | `/ceveto:status` | Check connection, show account info |
+| **Switch Environment** | `/ceveto:switch-env staging` | Switch between dev/staging/production |
+| **API Key** | `/ceveto:api-key pixels` | Generate API key (dev mode only) |
+
+## Quick Start
 
 ```
 /ceveto:setup
 ```
 
-Choose **Hosted** (recommended) or **Local** mode, then follow the prompts.
-
-## Connection Modes
-
-### Hosted (recommended)
-
-Connects to `mcp.ceveto.com` — no local install needed. Just your API credentials.
-
-### Local
-
-Runs MCP server locally via `uvx`. Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+Choose local or hosted mode, paste your API credentials, done.
 
 ## What you can do
 
@@ -38,6 +35,16 @@ Once connected, Claude can manage your Ceveto data:
 - Tags, documents, payments, and more
 
 Tools are generated dynamically from the API — new features appear automatically.
+
+## Environments
+
+| Environment | API | MCP Server |
+|-------------|-----|------------|
+| Dev | `localhost:8400` | local (stdio) |
+| Staging | `api.ceveto.dev` | `mcp.ceveto.dev` |
+| Production | `api.ceveto.com` | `mcp.ceveto.com` |
+
+Switch with `/ceveto:switch-env staging`.
 
 ## Multi-account
 

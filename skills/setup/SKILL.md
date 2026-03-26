@@ -1,56 +1,50 @@
 ---
 name: setup
-description: Set up Ceveto MCP connection. Use when the user says "setup ceveto", "configure ceveto", "connect to ceveto", or wants to add Ceveto API access.
+description: Set up or reconfigure Ceveto MCP connection. Use when the user says "setup ceveto", "configure ceveto", "connect to ceveto", "switch environment", "change to staging/production", or wants to modify their MCP connection.
 user-invocable: true
-allowed-tools: Read, Write, Edit, Bash, AskUserQuestion
+allowed-tools: Read, Write, Edit, Bash, Glob, AskUserQuestion
 ---
 
-# Configure Ceveto MCP Connection
+# Ceveto MCP Setup
 
-Connect Claude Code to a Ceveto account via MCP.
+## What this does
 
-## Steps
+Sets up the Ceveto MCP connection so Claude Code can access the Ceveto API — contacts, tasks, locations, assets, time tracking, and more.
 
-### 1. Ask the user how they want to connect
+## Flow
 
-Two options:
+### 1. Check existing config
 
-**A) Hosted (recommended)** — connect to `mcp.ceveto.com`. No local install needed.
-**B) Local** — run MCP server locally via `uvx`. Needs Python + uv.
+Read `.mcp.json` in the current project root. If `ceveto` server already exists, show the current config and ask if the user wants to reconfigure or switch environment.
 
-### 2A. Hosted setup
+### 2. Choose connection mode
 
-Ask for API credentials from the Ceveto dashboard (Settings → API Keys → Create):
-- **Username**
-- **Private Key**
+Ask the user:
 
-Write to `.mcp.json`:
+**A) Local (recommended for developers)** — runs MCP server locally via `uvx`. Needs Python 3.12+ and uv.
+**B) Hosted** — connects to `mcp.ceveto.com` or `mcp.ceveto.dev`. No local install needed.
 
-```json
-{
-  "mcpServers": {
-    "ceveto": {
-      "url": "https://mcp.ceveto.com/sse"
-    }
-  }
-}
-```
+### 3. Choose environment
 
-Note: In hosted mode, the user authenticates by calling the `connect` tool
-with their OAuth access token after connecting. The MCP server handles
-auth per-session.
+Ask which environment:
+- **Dev** — `https://localhost:8400` (local backend must be running)
+- **Staging** — `https://api.ceveto.dev`
+- **Production** — `https://api.ceveto.com`
 
-For now (before OAuth browser flow), users can also use local mode.
+### 4. Get credentials
 
-### 2B. Local setup
+Ask the user to paste their API credentials:
+- **Username** — 32-char hex string from Ceveto dashboard (Settings → API Keys)
+- **Private Key** — 64-char hex string (shown once when creating the key)
 
-Ask for:
-- **Username** — API key username
-- **Private Key** — Ed25519 private key (64-char hex)
-- **Base URL** — default `https://api.ceveto.com`
+If the user doesn't have credentials yet, tell them:
+1. Go to Ceveto dashboard → Settings → API Keys → Create
+2. Save both the username and private key
+3. Or for dev: run `cd new-ceveto && uv run python manage.py create_mcp_key <account-slug>`
 
-Write to `.mcp.json`:
+### 5. Write config
 
+**Local mode:**
 ```json
 {
   "mcpServers": {
@@ -67,12 +61,34 @@ Write to `.mcp.json`:
 }
 ```
 
-If `.mcp.json` already exists, merge the `ceveto` entry into existing `mcpServers`.
+**Hosted mode:**
+```json
+{
+  "mcpServers": {
+    "ceveto": {
+      "url": "<mcp-url>/sse"
+    }
+  }
+}
+```
 
-### 3. Protect secrets
+MCP URLs:
+- Staging: `https://mcp.ceveto.dev/sse`
+- Production: `https://mcp.ceveto.com/sse`
+
+If `.mcp.json` already exists, merge the `ceveto` entry — don't overwrite other servers.
+
+### 6. Protect secrets
 
 Add `.mcp.json` to `.gitignore` if not already there.
 
-### 4. Done
+### 7. Verify
 
 Tell the user to restart MCP with `/mcp` in Claude Code.
+
+After restart, call `whoami` to verify the connection works. Show the account name and whether they're an owner.
+
+If connection fails, troubleshoot:
+- Is the backend running? (dev mode)
+- Are credentials correct?
+- Is the URL reachable?
