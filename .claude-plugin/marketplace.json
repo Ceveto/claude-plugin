@@ -1,11 +1,13 @@
 {
   "name": "ceveto",
-  "description": "Ceveto Claude Code plugins",
+  "owner": {
+    "name": "Ceveto"
+  },
   "plugins": [
     {
       "name": "ceveto",
       "description": "Ceveto MCP server — AI agent access to the business management API",
-      "source": "https://github.com/Ceveto/claude-plugin",
+      "source": "./",
       "version": "1.0.0"
     }
   ]
