@@ -1,0 +1,13 @@
+{
+  "name": "ceveto",
+  "description": "Ceveto MCP server — AI agent access to the Ceveto business management API",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ceveto"
+  },
+  "homepage": "https://github.com/Ceveto/claude-plugin",
+  "repository": {
+    "url": "https://github.com/Ceveto/claude-plugin.git"
+  },
+  "license": "MIT"
+}
