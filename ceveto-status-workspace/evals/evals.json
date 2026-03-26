@@ -1,0 +1,40 @@
+{
+  "skill_name": "ceveto:status",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "ceveto status",
+      "expected_output": "Should read .mcp.json, call whoami MCP tool, show account name, environment, mode, owner status, and connection summary block",
+      "assertions": [
+        {"text": "Reads .mcp.json from project root", "type": "behavior"},
+        {"text": "Calls mcp__ceveto__whoami tool or falls back to direct API call", "type": "behavior"},
+        {"text": "Shows account name in output", "type": "output_contains"},
+        {"text": "Shows environment (Dev/Staging/Production)", "type": "output_contains"},
+        {"text": "Shows connection mode (Local/Hosted)", "type": "output_contains"},
+        {"text": "Shows owner status", "type": "output_contains"},
+        {"text": "Does NOT show private key", "type": "output_excludes"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "is ceveto connected",
+      "expected_output": "Should trigger the status skill and show connection status summary",
+      "assertions": [
+        {"text": "Skill triggers from natural language", "type": "trigger"},
+        {"text": "Shows Connected or Not Connected status", "type": "output_contains"},
+        {"text": "Shows troubleshooting if not connected", "type": "behavior"}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "which account am I on",
+      "expected_output": "Should call whoami and show account details including name, slug, and available accounts",
+      "assertions": [
+        {"text": "Skill triggers from account question", "type": "trigger"},
+        {"text": "Calls whoami or list_accounts", "type": "behavior"},
+        {"text": "Shows account name and slug", "type": "output_contains"},
+        {"text": "Lists available accounts if multiple", "type": "behavior"}
+      ]
+    }
+  ]
+}

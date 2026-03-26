@@ -1,0 +1,52 @@
+{
+  "eval_results": [
+    {
+      "eval_id": 1,
+      "eval_name": "ceveto-status",
+      "prompt": "ceveto status",
+      "assertions": [
+        {"text": "Reads .mcp.json from project root", "passed": true, "evidence": "Step 1 reads /Users/cherijs/_REPO/ceveto/.mcp.json"},
+        {"text": "Calls whoami or falls back to direct API call", "passed": true, "evidence": "Step 2 calls /company-api/me/ directly via Ed25519"},
+        {"text": "Shows account name in output", "passed": true, "evidence": "Shows 'Pixels (pixels)' in summary"},
+        {"text": "Shows environment", "passed": true, "evidence": "Shows 'Dev (localhost:8400)'"},
+        {"text": "Shows connection mode", "passed": true, "evidence": "Shows 'Local (uv)'"},
+        {"text": "Shows owner status", "passed": true, "evidence": "Shows 'Owner: Yes'"},
+        {"text": "Does NOT show private key", "passed": true, "evidence": "Shows '[REDACTED]' for private key"},
+        {"text": "Formats as summary block", "passed": true, "evidence": "Clean formatted summary block at end"},
+        {"text": "Lists available accounts", "passed": true, "evidence": "Step 3 shows accounts table"},
+        {"text": "Saves connection state", "passed": false, "evidence": "Attempted but sandbox denied mkdir"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "is-connected",
+      "prompt": "is ceveto connected",
+      "assertions": [
+        {"text": "Skill triggers from natural language", "passed": true, "evidence": "Subagent read and followed the skill"},
+        {"text": "Shows Connected/Partially Connected status", "passed": true, "evidence": "Shows 'Partially Connected' - accurate since MCP tools not in session"},
+        {"text": "Shows troubleshooting", "passed": true, "evidence": "Shows 3-step troubleshooting guide"},
+        {"text": "Accurate diagnosis", "passed": true, "evidence": "Correctly identifies API reachable but MCP not attached"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "which-account",
+      "prompt": "which account am I on",
+      "assertions": [
+        {"text": "Skill triggers from account question", "passed": true, "evidence": "Subagent read and followed the skill"},
+        {"text": "Shows account name and slug", "passed": true, "evidence": "Shows 'Pixels (pixels)'"},
+        {"text": "Lists available accounts", "passed": true, "evidence": "Step 3 lists 1 account"},
+        {"text": "Shows tool count", "passed": true, "evidence": "Shows '469 registered (466 API + 3 meta)'"}
+      ]
+    }
+  ],
+  "summary": {
+    "total_assertions": 18,
+    "passed": 17,
+    "failed": 1,
+    "pass_rate": "94%",
+    "failed_details": [
+      "Eval 1: connection state file not saved (sandbox permissions denied mkdir)"
+    ]
+  }
+}

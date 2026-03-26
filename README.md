@@ -18,6 +18,7 @@ claude plugin install ceveto
 | **Explore** | "show me contacts" | Browse and search business data via MCP |
 | **Report** | "ceveto report" | Generate business summaries and analytics |
 | **Switch Env** | "switch to staging" | Switch between dev/staging/production |
+| **Scenario** | "avārijas remonts" | Execute business scenarios (tasks, clients, workflows) |
 | **API Key** | "create api key" | Generate API key (dev mode only) |
 
 ## Quick Start
