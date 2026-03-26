@@ -5,53 +5,55 @@ Claude Code plugin for connecting to the Ceveto business management API via MCP 
 ## Install
 
 ```bash
-claude plugin install https://github.com/Ceveto/claude-plugin
+claude plugin marketplace add https://github.com/Ceveto/claude-plugin
+claude plugin install ceveto
 ```
 
 ## Setup
 
-After installation, run the setup skill:
+After installation, run the setup skill in your Ceveto project:
 
 ```
-/ceveto:setup /path/to/new-ceveto
+/ceveto:setup
 ```
 
-This will:
-1. Generate Ed25519 API credentials
-2. Configure `.mcp.json` for your project
-3. Add `.mcp.json` to `.gitignore`
+The skill will automatically find the backend, generate API credentials, and configure everything.
 
 ## What you get
 
-Once configured, Claude Code gets direct access to the Ceveto API with tools for:
+Once configured, Claude Code gets direct access to the Ceveto API. Tools are dynamically generated from the backend's OpenAPI schema — every API endpoint becomes an MCP tool automatically.
 
-- **Contacts** — list, create, update, delete
-- **Tasks** — list, create, update, transition status
-- **Locations** — list, create, update, delete
-- **Assets** — CMMS asset management
-- **Time tracking** — Traksy time entries and schedules
-- **Teams & Skills** — team management
-- **Tags, Documents, Payments** — and more
-
-Tools are dynamically generated from the backend's OpenAPI schema — any new API endpoint automatically becomes available.
+Modules include: Contacts, Tasks, Locations, Assets (CMMS), Time Tracking (Traksy), Teams, Skills, Tags, Documents, Payments, and more.
 
 ## Requirements
 
-- Python 3.13+ with `uv`
-- A running Ceveto backend (`new-ceveto`)
+- Python 3.13+ with [uv](https://docs.astral.sh/uv/)
+- A running Ceveto backend
 - An account in the system
 
 ## How it works
 
-The MCP server (`ceveto_mcp/`) runs as a subprocess launched by Claude Code. It:
+```
+Claude Code → MCP Server (ceveto_mcp/) → Ed25519 signed HTTP → Dashboard API
+```
 
-1. Connects to the backend via Ed25519-signed HTTP requests
-2. Reads the OpenAPI schema at startup
-3. Generates MCP tools for each API endpoint
-4. Filters tools by the API user's permissions
+1. The MCP server runs as a subprocess launched by Claude Code
+2. On startup it fetches the OpenAPI schema from the backend
+3. Each API endpoint becomes an MCP tool with proper parameter schemas
+4. Tools are filtered by the API user's permissions — read-only users only see read tools
+5. Condition limits (e.g. `max_amount`) are shown in tool descriptions
+
+## Multi-account
+
+One API key can access multiple accounts. The MCP server auto-selects if only one account is available, or you can switch with:
+
+- `whoami` — see current account
+- `list_accounts` — see all available accounts
+- `switch_default_account` — change active account
 
 ## Security
 
-- Ed25519 public-key cryptography (no shared secrets)
-- Per-user permissions — tools filtered by what the API key can access
-- `.mcp.json` contains credentials and should never be committed
+- **Ed25519 signatures** — no shared secrets, cryptographic request signing
+- **Permission-filtered tools** — only tools the API key has access to are registered
+- **Method-level filtering** — read-only keys don't see write tools
+- **Credentials in .mcp.json** — automatically added to .gitignore during setup
