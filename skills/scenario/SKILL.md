@@ -10,6 +10,28 @@ argument-hint: "[what needs to be done]"
 Help users create and manage tasks by asking the right questions,
 looking up existing data, and filling in the gaps.
 
+## Known scenarios (references/)
+
+This skill has detailed reference files for real business scenarios.
+When the user's request matches one, read the reference file for context
+on the full workflow, entities involved, and expected outcome.
+
+| Pattern | Reference file | When to read |
+|---------|---------------|--------------|
+| Emergency/avārija/iekārta nestrādā | `scenario-01-emergency-repair.md` | Urgent repair requests |
+| Profilakse/apkope/recurring/ikmēneša | `scenario-02-recurring-maintenance.md` | Scheduled maintenance |
+| Paraksts/nodošana/signoff | `scenario-03-onsite-signoff.md` | Work acceptance with signature |
+| Būvprojekts/subtaski/parent-child | `scenario-04-construction-subtasks.md` | Multi-part projects |
+| Brigāde/komanda/sadarbība | `scenario-05-team-collaboration.md` | Team assignments |
+| Darba laiks/izmaksas/stundas | `scenario-06-time-cost-transparency.md` | Time/cost tracking |
+| Drošība/prerequisites/bīstams | `scenario-07-safety-prerequisites.md` | Safety requirements |
+| Multi-klients/pielāgojumi/forms | `scenario-08-multi-client-customization.md` | Client-specific workflows |
+
+Read only the relevant file — don't load all of them. Use the scenario
+as domain knowledge to ask better questions and create proper entities.
+You don't need to follow the scenario step-by-step — adapt to what
+the user actually needs.
+
 ## Key principle
 
 The user will give you minimal info like "uztaisi tasku Pārtikas Namam,
